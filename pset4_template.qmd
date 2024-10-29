@@ -23,11 +23,11 @@ include-before-body:
 ## Submission Steps (10 pts)
 
 Partner 1:  Yuna Baek / ybaek / 12370259
-Partner 2: Lizzy Diaz / 
+Partner 2: Lizzy Diaz / lizzydiaz / endiaz
 
-1. "This submission is my work alone and complies with the 30538 integrity policy." Add your initials to indicate your agreement: \*\*\*YB\*\*
-2. "I have uploaded the names of anyone I worked with on the problem set **[here](https://docs.google.com/forms/d/1-zzHx762odGlpVWtgdIC55vqF-j3gqdAp6Pno1rIGK0/edit)**"  \*\*\*YB\*\* (1 point)
-3. Late coins used this pset: \*\*0\*\* Late coins left after submission: \*\*3\*\*
+1. "This submission is my work alone and complies with the 30538 integrity policy." Add your initials to indicate your agreement: \*\*\*YB\*\*, \*\*\*LD\*\*
+2. "I have uploaded the names of anyone I worked with on the problem set **[here](https://docs.google.com/forms/d/1-zzHx762odGlpVWtgdIC55vqF-j3gqdAp6Pno1rIGK0/edit)**"  \*\*\*YB\*\*, \*\*\*LD\*\*(1 point)
+3. Late coins used this pset: \*\*0\*\* Late coins left after submission: \*\*3\*\*(Yuna), , \*\*\*2\*\*(Lizzy)
 
 ## Download and explore the Provider of Services (POS) file (10 pts)
 ```{python}
@@ -38,6 +38,7 @@ alt.renderers.enable("png")
 import numpy as np
 import time
 import warnings 
+import os
 warnings.filterwarnings('ignore')
 ```
 
@@ -75,8 +76,21 @@ ZIP_CD:  Five-digit ZIP code for a provider's physical address.
     a.
 
 ```{python}
-file_path = "/Users/yunabaek/Desktop/3. Python II/problem-set-4-lizzy-yuna/"
-pos_16 = pd.read_csv("pos2016.csv")
+# Change path variable to read in files from local 
+path = r"C:\Users\User\OneDrive - The University of Chicago\4_DAP-2\PS4 Data"
+
+def load_dataframes(path): 
+    pos_16 = pd.read_csv(os.path.join(path, 'pos2016.csv'), encoding='ISO-8859-1') 
+    pos_17 = pd.read_csv(os.path.join(path, 'pos2017.csv'), encoding='ISO-8859-1') 
+    pos_18 = pd.read_csv(os.path.join(path, 'pos2018.csv'), encoding='ISO-8859-1') 
+    pos_19 = pd.read_csv(os.path.join(path, 'pos2019.csv'), encoding='ISO-8859-1') 
+    return pos_16, pos_17, pos_18, pos_19
+
+pos_16, pos_17, pos_18, pos_19 = load_dataframes(path)
+
+# This is initially how we read answered question 1. We changed it to the above code to make switching between partners much easier. 
+# file_path = "/Users/yunabaek/Desktop/3. Python II/problem-set-4-lizzy-yuna/"
+# pos_16 = pd.read_csv("pos2016.csv")
 pos_16.info()
 ```
 
@@ -93,12 +107,12 @@ print(f"There are {number_rows} rows and {unique_fac_names} unique hospitals.")
 
 3. Repeat the previous 3 steps with 2017Q4, 2018Q4, and 2019Q4 and then append them together. Plot the number of observations in your dataset by year.
 
-Loading 17-19 data
-```{python}
-pos_17 = pd.read_csv("pos2017.csv")
+Loading 17-19 data (Note: This is the code we originally wrote. Changed in favor of code written above in 2a).
+```{bash}
+# pos_17 = pd.read_csv("pos2017.csv")
 # encountered error for 2018, 2019: 'utf-8' codec can't decode byte 0x98 in position 11050: invalid start byte
-pos_18 = pd.read_csv("pos2018.csv", encoding='ISO-8859-1')
-pos_19 = pd.read_csv("pos2019.csv", encoding='ISO-8859-1')
+# pos_18 = pd.read_csv("pos2018.csv", encoding='ISO-8859-1')
+# pos_19 = pd.read_csv("pos2019.csv", encoding='ISO-8859-1')
 ```
 
 Subsetting data
