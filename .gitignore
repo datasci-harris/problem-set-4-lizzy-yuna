@@ -1,2 +1,15 @@
-.venv/
+.venv
+venv
 .csv/
+.log 
+
+# GitHub or CI configuration artifacts
+.github/workflows/*.log
+**/.pytest_cache
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-projectx
+
