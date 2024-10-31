@@ -182,12 +182,96 @@ The two plots are almost identical, suggesting that the data structure is consis
 
 ## Identify hospital closures in POS file (15 pts) (*)
 
-1. 
+1. In this question, I am treating each provider number as a unique hospital. This is because I ran into an issue where some hospitals, for each year, had both a 0 and 1 termination code, and different provider numbers. Using the provided definition, there were 174 hospitals open in 2016 but closed by 2019. 
+
+Sources: <https://learnpython.com/blog/python-set-operations/>
+
+```{python}
+# Find active hospitals in 2016 (PGM_TRMNTN_CD==0)
+active_2016 = pos_df[(pos_df['Year'] == 2016) & (pos_df['PGM_TRMNTN_CD'] == 0)]['PRVDR_NUM'].unique()
+
+# Filter hospitals that have non-zero PGM_TRMNTN_CD in 2017, 2018, or 2019
+closed_hospitals = pos_df[(pos_df['PRVDR_NUM'].isin(active_2016)) & 
+    (pos_df['Year'].isin([2017, 2018, 2019])) & 
+    (pos_df['PGM_TRMNTN_CD'] != 0)]
+
+# Find hospitals present in data in 2016, but not in data after that
+present_after_2016 = pos_df[pos_df['Year'].isin([2017, 2018, 2019])]['PRVDR_NUM'].unique()
+potential_closures = set(active_2016) - set(present_after_2016)
+print(potential_closures) 
+# empty, implying no hospitals are in the data that are only 2016
+
+# Find suspected year of closure
+year_closed = closed_hospitals.groupby('PRVDR_NUM')['Year'].min().reset_index() 
+year_closed.columns = ['PRVDR_NUM', 'YR_CLOSED']
+
+suspected_closed = pos_df[pos_df['PRVDR_NUM'].isin(year_closed['PRVDR_NUM'])]
+# drop duplicate hospitals, by PRVDR_NUM
+suspected_closed = suspected_closed.drop_duplicates(subset=['PRVDR_NUM'])
+# Merge with suspected year of closure
+suspected_closed = suspected_closed.merge(year_closed, on="PRVDR_NUM")
+# keep only desired columns 
+suspected_closed = suspected_closed[['FAC_NAME', 'ZIP_CD', 'YR_CLOSED']]
+suspected_closed.head(3)
+
+print(f'There are {len(suspected_closed)} hospitals that fit this definition.')
+```
 2. 
-3. 
+
+```{python}
+suspected_closed[['FAC_NAME', 'YR_CLOSED']].sort_values(by=['FAC_NAME']).head(10)
+```
+
+3.  However, not all suspected hospital closures are true closures. For example, in the case of a merger, a CMS certification number will be appear to be “terminated,” but then the hospital re-appear under a similar name/address with a new CMS certification number in the next year. As a first pass to address this, remove any suspected hospital closures that are in zip codes where the number of active hospitals does not decrease in the year after the suspected closure.
+
+Sources: <https://www.geeksforgeeks.org/apply-function-to-every-row-in-a-pandas-dataframe/>
+
+<https://discovery.cs.illinois.edu/guides/DataFrame-Fundamentals/run-a-function-on-rows-dataframe/>
+
+<https://flexiple.com/python/if-not-python>
+
+ChatGPT: I couldn't get the function to run row-wise properly. It suggested to alter my code to assign zip_code and year to their own variables. I also used it to figure out how to properly extract the number of hospitals in year_before and year_after (year_after['Hospital_Count'].values[0]). 
+
+```{python}
+active_hospitals = pos_df[pos_df['PGM_TRMNTN_CD'] == 0]
+hospitals_per_year = active_hospitals.groupby(['ZIP_CD', 'Year']).size().reset_index(name='Hospital_Count')
+hospitals_per_year['Diff_Count'] = hospitals_per_year.groupby('ZIP_CD')['Hospital_Count'].diff()
+
+def check_decrease(row):
+    zip_code = row['ZIP_CD']
+    year = row['YR_CLOSED']
+    year_before = hospitals_per_year[(hospitals_per_year['ZIP_CD'] == zip_code) & (hospitals_per_year['Year'] == year)]
+    year_after = hospitals_per_year[(hospitals_per_year['ZIP_CD'] == zip_code) & (hospitals_per_year['Year'] == year + 1)]
+    
+    if not year_before.empty and not year_after.empty:
+        return year_after['Hospital_Count'].values[0] < year_before['Hospital_Count'].values[0]
+    return True
+
+# Apply check_decrease to suspected_closed and filter
+filtered_suspected_closed = suspected_closed[suspected_closed.apply(check_decrease, axis=1)]
+
+```
+
     a.
+    
+ ```{python}
+filtered_closed_names = filtered_suspected_closed['FAC_NAME']
+merger_acquisition = suspected_closed[~suspected_closed['FAC_NAME'].isin(filtered_closed_names)]
+
+print(f'Among the suspected closures, {len(merger_acquisition)} are suspected to be mergers and acquisitions.')
+```
+
     b.
+
+```{python}
+print(f'After correcting for this, we have {len(filtered_suspected_closed)} left defined as closures.')
+```
+    
     c.
+
+```{python}
+filtered_suspected_closed.sort_values(by=['FAC_NAME']).head(10)
+```
 
 ## Download Census zip code shapefile (10 pt) 
 
@@ -218,3 +302,15 @@ The two plots are almost identical, suggesting that the data structure is consis
 4. 
 
 ## Reflecting on the exercise (10 pts) 
+
+a. Some potential issues with identifying closures using this "first pass" method are: 
+
+* Using the facility name versus the CMS code: A hospital could have changed names but not their code, or vice versa. This could cause issues in correctly identifying and matching hospitals across subsetted data. We should be clear on how codes and names are assigned and can change through time. A hospital name change could inaccurately be interpreted as a closure.
+
+* Location: A hospital might have closed in one zip code and re-opened nearby, but in another zip code. This would be reflected as a closure using our method, but in practice probably shouldn't be. 
+
+* The data could be skewed based on when information is collected. A merger occuring in one year might not show up until the next year's data is collected, and would be inaccurately interpreted. 
+
+We could do a better job at identifying hospital closures by ensuring that the CMS code does not change for a specific facility across time. If it does, we would want information on why. For example, if the code changed because the hospital switched ownership, we might incorrectly count a closure. We should cross-verify this information with other data sources. 
+
+b. 
