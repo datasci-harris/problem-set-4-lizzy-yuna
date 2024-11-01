@@ -59,6 +59,7 @@ import time
 import warnings 
 import os
 warnings.filterwarnings('ignore')
+import matplotlib.pyplot as plt
 ```
 
 1. Read through the rest of the problem set and look through the data dictionary to identify which variables you will need to complete the exercise, and use the tool on data.cms.gov into restrict to those variables (“Manage Columns”) before exporting (“Export”). Download this for 2016 and call it pos2016.csv. What are the variables you pulled?
@@ -97,6 +98,7 @@ ZIP_CD:  Five-digit ZIP code for a provider's physical address.
 ```{python}
 # Change path variable to read in files from local 
 path = r"C:\Users\User\OneDrive - The University of Chicago\4_DAP-2\PS4 Data"
+# path = "/Users/yunabaek/Desktop/3. Python II/problem-set-4-lizzy-yuna/"
 
 def load_dataframes(path): 
     pos_16 = pd.read_csv(os.path.join(path, 'pos2016.csv'), encoding='ISO-8859-1') 
@@ -108,7 +110,7 @@ def load_dataframes(path):
 pos_16, pos_17, pos_18, pos_19 = load_dataframes(path)
 
 # This is initially how we read answered question 1. We changed it to the above code to make switching between partners much easier. 
-# file_path = "/Users/yunabaek/Desktop/3. Python II/problem-set-4-lizzy-yuna/"
+# path = "/Users/yunabaek/Desktop/3. Python II/problem-set-4-lizzy-yuna/"
 # pos_16 = pd.read_csv("pos2016.csv")
 pos_16.info()
 ```
@@ -235,8 +237,8 @@ suspected_closed.head(3)
 
 print(f'There are {len(suspected_closed)} hospitals that fit this definition.')
 ```
-2. 
 
+2. 
 ```{python}
 suspected_closed[['FAC_NAME', 'YR_CLOSED']].sort_values(by=['FAC_NAME']).head(10)
 ```
@@ -268,11 +270,9 @@ def check_decrease(row):
 
 # Apply check_decrease to suspected_closed and filter
 filtered_suspected_closed = suspected_closed[suspected_closed.apply(check_decrease, axis=1)]
-
 ```
 
     a.
-    
  ```{python}
 filtered_closed_names = filtered_suspected_closed['FAC_NAME']
 merger_acquisition = suspected_closed[~suspected_closed['FAC_NAME'].isin(filtered_closed_names)]
@@ -281,23 +281,94 @@ print(f'Among the suspected closures, {len(merger_acquisition)} are suspected to
 ```
 
     b.
-
 ```{python}
 print(f'After correcting for this, we have {len(filtered_suspected_closed)} left defined as closures.')
 ```
-    
-    c.
 
+    c.
 ```{python}
 filtered_suspected_closed.sort_values(by=['FAC_NAME']).head(10)
 ```
 
 ## Download Census zip code shapefile (10 pt) 
 
-1. 
-    a.
-    b. 
-2. 
+1. This is non-tabular data. 
+    a. What are the five file types and what type of information is in each file?
+
+Database file (dbf): attribute information for spatial features. Row = feature (point, line, etc.), column = specific attribute (name, etc.).
+Projection file (prj): describes Coordinate Reference System (CRS) of the shapefile.
+Shapefile (shp): feature geometrics data for spatial features, including coordinates. 
+Shape index file (shx): positional index
+Extensible markup language (xml): metadata about spatial data
+
+    b. It will be useful going forward to have a sense going forward of which files are big versus small. After unzipping, how big is each of the datasets?
+
+```{python}
+import os
+
+file_types = ['.dbf', '.prj', '.shp', '.shx', '.xml']
+directory = '/Users/yunabaek/Desktop/3. Python II/gz_2010_us_860_00_500k' 
+
+for file in os.listdir(directory):
+    if any(file.endswith(ext) for ext in file_types):
+        file_path = os.path.join(directory, file)
+        file_size = os.path.getsize(file_path)
+        print(f"{file}: {file_size} bytes")
+```
+
+2. Load the zip code shapefile and restrict to Texas zip codes. (Hint: you can identify which state a zip code is in using the first 2-3 numbers in the zip code. Then calculate the number of hospitals per zip code in 2016 based on the cleaned POS file from the previous step. Plot a choropleth of the number of hospitals by zip code in Texas.
+
+```{python}
+import geopandas as gpd
+import fiona
+import pyogrio
+shppath = "/Users/yunabaek/Desktop/3. Python II/gz_2010_us_860_00_500k/gz_2010_us_860_00_500k.shp"
+data_shp = gpd.read_file(shppath)
+texas_shp = data_shp[data_shp['ZCTA5'].str.startswith(('75', '76', '77', '78', '79'))]
+```
+
+```{python}
+# Filtering shapefile
+# Converting into string
+hospitals_per_year['ZIP_CD'] = hospitals_per_year['ZIP_CD'].astype(str)
+
+# Subsetting for 2016
+hospitals_2016 = hospitals_per_year[
+    (hospitals_per_year['Year'] == 2016) &
+    (hospitals_per_year['ZIP_CD'].str.startswith(('75', '76', '77', '78', '79')))
+]
+
+# Aggregating per zip-code count
+hospitals_count = hospitals_2016.groupby('ZIP_CD')['Hospital_Count'].sum().reset_index()
+hospitals_count.columns = ['ZCTA5', 'Number_of_Hospitals']
+```
+
+```{python}
+# Fixing variable types before merging
+hospitals_count['ZCTA5'] = hospitals_count['ZCTA5'].astype(str).str.replace('.0', '').astype(int)
+hospitals_count['ZCTA5'] = hospitals_count['ZCTA5'].astype(int)
+texas_shp['ZCTA5'] = texas_shp['ZCTA5'].astype(int)
+```
+
+```{python}
+# Merging the Texas shapefile with the hospital counts
+texas_hospitals = texas_shp.merge(hospitals_count, on='ZCTA5', how='left')
+
+# Fill NaN values with 0 (if any ZIP codes have no hospitals)
+texas_hospitals['Number_of_Hospitals'].fillna(0, inplace=True)
+
+fig, ax = plt.subplots(1, 1, figsize=(12, 10))
+texas_hospitals.plot(column='Number_of_Hospitals', ax=ax, legend=True,
+                     cmap='OrRd',
+                     legend_kwds={'label': "Number of Hospitals",
+                                  'orientation': "horizontal"},
+                     vmin=0, vmax=5)  # Set vmin and vmax according to your data
+
+plt.title('Number of Hospitals per ZIP Code in Texas (2016)')
+plt.xlabel('Longitude')
+plt.ylabel('Latitude')
+plt.show()
+```
 
 ## Calculate zip code’s distance to the nearest hospital (20 pts) (*)
 
