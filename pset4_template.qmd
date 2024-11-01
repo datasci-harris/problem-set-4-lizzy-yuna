@@ -365,8 +365,6 @@ texas_hospitals.plot(column='Number_of_Hospitals', ax=ax, legend=True,
                      vmin=0, vmax=5)  # Set vmin and vmax according to your data
 
 plt.title('Number of Hospitals per ZIP Code in Texas (2016)')
-plt.xlabel('Longitude')
-plt.ylabel('Latitude')
 plt.show()
 ```
 
