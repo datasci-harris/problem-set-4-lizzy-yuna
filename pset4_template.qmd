@@ -350,6 +350,7 @@ hospitals_count['ZCTA5'] = hospitals_count['ZCTA5'].astype(int)
 texas_shp['ZCTA5'] = texas_shp['ZCTA5'].astype(int)
 ```
 
+Source: <https://geopandas.org/en/stable/docs/user_guide/mapping.html>
 ```{python}
 # Merging the Texas shapefile with the hospital counts
 texas_hospitals = texas_shp.merge(hospitals_count, on='ZCTA5', how='left')
@@ -357,12 +358,11 @@ texas_hospitals = texas_shp.merge(hospitals_count, on='ZCTA5', how='left')
 # Fill NaN values with 0 (if any ZIP codes have no hospitals)
 texas_hospitals['Number_of_Hospitals'].fillna(0, inplace=True)
 
-fig, ax = plt.subplots(1, 1, figsize=(12, 10))
-texas_hospitals.plot(column='Number_of_Hospitals', ax=ax, legend=True,
+texas_hospitals.plot(column='Number_of_Hospitals', legend=True,
                      cmap='OrRd',
                      legend_kwds={'label': "Number of Hospitals",
                                   'orientation': "horizontal"},
-                     vmin=0, vmax=5)  # Set vmin and vmax according to your data
+                     vmin=0, vmax=5)
 
 plt.title('Number of Hospitals per ZIP Code in Texas (2016)')
 plt.show()
@@ -383,7 +383,12 @@ plt.show()
     
 ## Effects of closures on access in Texas (15 pts)
 
-1. 
+1. Using the corrected hospital closures dataset from the first section, create a list of directly affected zip codes in Texas – that is, those with at least one closure in 2016-2019. Display a table of the number of zip codes vs. the number of closures they experienced.
+
+```{python}
+
+```
+
 2. 
 3. 
 4. 
