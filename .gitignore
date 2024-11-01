@@ -1,7 +1,9 @@
 .venv
 venv
 .csv/
+.csv
 .log 
+gz_2010_us_860_00_500k/
 
 # GitHub or CI configuration artifacts
 .github/workflows/*.log
