@@ -495,8 +495,7 @@ average_distance.head(3)
 
     b.
 ```{python}
-print(f'The average distance to the nearest hospital for zip codes in \
-    Texas is {nearest_hospital.loc[:,"distance"].mean():.2f} miles.')
+print(f'The average distance to the nearest hospital for zip codes in Texas is {nearest_hospital.loc[:,"distance"].mean():.2f} miles.')
 ```
 
     c.
