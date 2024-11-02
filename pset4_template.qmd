@@ -33,7 +33,7 @@ Please refer to the minilesson on code style
 3. Partner 1 will accept the `ps4` and then share the link it creates with their partner. You can only share it with one partner so you will not be able to change it after your partner has accepted. 
 4. "This submission is our work alone and complies with the 30538 integrity policy." Add your initials to indicate your agreement: \*\*\*YB\*\*, \*\*\*LD\*\*
 5. "I have uploaded the names of anyone else other than my partner and I worked with on the problem set **[here](https://docs.google.com/forms/d/185usrCREQaUbvAXpWhChkjghdGgmAZXA3lPWpXLLsts/edit)**"  (1 point)
-6. Late coins used this pset: \*\*\_\_\*\* Late coins left after submission: \*\*\_3_\*\* (Yuna), \*\*\_2_\*\* (Lizzy)
+6. Late coins used this pset: \*\*\_1_\*\* Late coins left after submission: \*\*\_2_\*\* (Yuna), \*\*\_1_\*\* (Lizzy)
 7. Knit your `ps4.qmd` to an PDF file to make `ps4.pdf`, 
     * The PDF should not be more than 25 pages. Use `head()` and re-size figures when appropriate. 
 8. (Partner 1): push  `ps4.qmd` and `ps4.pdf` to your github repo.
@@ -67,17 +67,29 @@ PRVDR_CTGRY_SBTYP_CD: Identifies the subtype of the provider, within the primary
 PRVDR_NUM: Six or ten position identification number that is assigned to a certified provider. This is the CMS Certification Number.
 
 PGM_TRMNTN_CD: Indicates the current termination status for the provider.
+
 00=ACTIVE PROVIDER
+
 01=VOLUNTARY-MERGER, CLOSURE
+
 02=VOLUNTARY-DISSATISFACTION WITH REIMBURSEMENT
+
 03=VOLUNTARY-RISK OF INVOLUNTARY TERMINATION
+
 04=VOLUNTARY-OTHER REASON FOR WITHDRAWAL
+
 05=INVOLUNTARY-FAILURE TO MEET HEALTH/SAFETY REQ
+
 06=INVOLUNTARY-FAILURE TO MEET AGREEMENT
+
 07=OTHER-PROVIDER STATUS CHANGE
+
 08=NONPAYMENT OF FEES - CLIA Only
+
 09=REV/UNSUCCESSFUL PARTICIPATION IN PT - CLIA Only
+
 10=REV/OTHER REASON - CLIA Only
+
 11=INCOMPLETE CLIA APPLICATION INFORMATION - CLIA Only 
 
 FAC_NAME: Name of the provider certified to participate in the Medicare and/or Medicaid programs.
@@ -88,8 +100,8 @@ ZIP_CD:  Five-digit ZIP code for a provider's physical address.
 
 ```{python}
 # Change path variable to read in files from local 
-# path = r"C:\Users\User\OneDrive - The University of Chicago\4_DAP-2\PS4 Data"
-path = "/Users/yunabaek/Desktop/3. Python II/problem-set-4-lizzy-yuna/"
+path = r"C:\Users\User\OneDrive - The University of Chicago\4_DAP-2\PS4 Data"
+# path = "/Users/yunabaek/Desktop/3. Python II/problem-set-4-lizzy-yuna/"
 
 def load_dataframes(path): 
     pos_16 = pd.read_csv(os.path.join(path, 'pos2016.csv'), encoding='ISO-8859-1') 
@@ -213,7 +225,9 @@ present_after_2016 = pos_df[pos_df['Year'].isin([2017, 2018, 2019])]['PRVDR_NUM'
 potential_closures = set(active_2016) - set(present_after_2016)
 print(potential_closures) 
 # empty, implying no hospitals are in the data that are only 2016
+```
 
+```{python}
 # Find suspected year of closure
 year_closed = closed_hospitals.groupby('PRVDR_NUM')['Year'].min().reset_index() 
 year_closed.columns = ['PRVDR_NUM', 'YR_CLOSED']
@@ -265,7 +279,8 @@ filtered_suspected_closed = suspected_closed[suspected_closed.apply(check_decrea
 ```
 
     a.
- ```{python}
+
+```{python}
 filtered_closed_names = filtered_suspected_closed['FAC_NAME']
 merger_acquisition = suspected_closed[~suspected_closed['FAC_NAME'].isin(filtered_closed_names)]
 
@@ -273,11 +288,13 @@ print(f'Among the suspected closures, {len(merger_acquisition)} are suspected to
 ```
 
     b.
+
 ```{python}
 print(f'After correcting for this, we have {len(filtered_suspected_closed)} left defined as closures.')
 ```
 
     c.
+
 ```{python}
 filtered_suspected_closed.sort_values(by=['FAC_NAME']).head(10)
 ```
@@ -299,8 +316,8 @@ filtered_suspected_closed.sort_values(by=['FAC_NAME']).head(10)
 import os
 
 file_types = ['.dbf', '.prj', '.shp', '.shx', '.xml']
-directory = '/Users/yunabaek/Desktop/3. Python II/gz_2010_us_860_00_500k' 
-
+# directory = '/Users/yunabaek/Desktop/3. Python II/gz_2010_us_860_00_500k' 
+directory = r'C:\Users\User\OneDrive - The University of Chicago\4_DAP-2\gz_2010_us_860_00_500k'
 for file in os.listdir(directory):
     if any(file.endswith(ext) for ext in file_types):
         file_path = os.path.join(directory, file)
@@ -314,8 +331,8 @@ for file in os.listdir(directory):
 import geopandas as gpd
 # import fiona
 import pyogrio
-# shppath = r"C:\Users\User\OneDrive - The University of Chicago\4_DAP-2\gz_2010_us_860_00_500k"
-shppath = '/Users/yunabaek/Desktop/3. Python II/problem-set-4-lizzy-yuna/gz_2010_us_860_00_500k/gz_2010_us_860_00_500k.shp'
+shppath = r"C:\Users\User\OneDrive - The University of Chicago\4_DAP-2\gz_2010_us_860_00_500k"
+# shppath = '/Users/yunabaek/Desktop/3. Python II/problem-set-4-lizzy-yuna/gz_2010_us_860_00_500k/gz_2010_us_860_00_500k.shp'
 data_shp = gpd.read_file(shppath)
 texas_shp = data_shp[data_shp['ZCTA5'].str.startswith(('75', '76', '77', '78', '79'))]
 ```
