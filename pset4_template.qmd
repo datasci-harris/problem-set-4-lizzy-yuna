@@ -358,12 +358,13 @@ texas_hospitals = texas_shp.merge(hospitals_count, on='ZCTA5', how='left')
 texas_hospitals['Number_of_Hospitals'].fillna(0, inplace=True)
 
 texas_hospitals.plot(column='Number_of_Hospitals', legend=True,
-                     cmap='OrRd',
+                     cmap='viridis',
                      legend_kwds={'label': "Number of Hospitals",
                                   'orientation': "horizontal"},
                      vmin=0, vmax=5)
 
 plt.title('Number of Hospitals per ZIP Code in Texas (2016)')
+plt.axis('off')
 plt.show()
 ```
 
@@ -490,17 +491,20 @@ print(f'The average distance to the nearest hospital for zip codes in \
     c.
 ```{python}
 # Merge TX zip shapes with avg distance to hospitals
-texas_hospitals_shp = zips_texas_centroids.merge(
+texas_hospitals_distance = zips_texas_centroids.merge(
     average_distance, 
     left_on='ZCTA5', 
     right_on='zip', 
     how='outer'
 )
 
-texas_hospitals_shp.plot(column='distance', legend=True)
-plt.axis('off')
-plt.legend(title='Miles')
+texas_hospitals_distance.plot(column='distance', legend=True,
+    cmap='viridis',
+    legend_kwds={'label':'Miles',
+    'orientation':'horizontal'}
+)
 plt.title('Average Distance to Nearest Hospital by Zip Code')
+plt.axis('off')
 plt.show()
 ```
 
