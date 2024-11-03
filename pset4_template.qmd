@@ -71,8 +71,8 @@ import matplotlib.pyplot as plt
 
 ```{python}
 # Change path variable to read in files from local 
-# path = r"C:\Users\User\OneDrive - The University of Chicago\4_DAP-2\PS4 Data"
-path = "/Users/yunabaek/Desktop/3. Python II/problem-set-4-lizzy-yuna/"
+path = r"C:\Users\User\OneDrive - The University of Chicago\4_DAP-2\PS4 Data"
+# path = "/Users/yunabaek/Desktop/3. Python II/problem-set-4-lizzy-yuna/"
 
 def load_dataframes(path): 
     pos_16 = pd.read_csv(os.path.join(path, 'pos2016.csv'), encoding='ISO-8859-1') 
@@ -286,8 +286,8 @@ filtered_suspected_closed.sort_values(by=['FAC_NAME']).head(10)
 import os
 
 file_types = ['.dbf', '.prj', '.shp', '.shx', '.xml']
-directory = '/Users/yunabaek/Desktop/3. Python II/gz_2010_us_860_00_500k' 
-# directory = r'C:\Users\User\OneDrive - The University of Chicago\4_DAP-2\gz_2010_us_860_00_500k'
+# directory = '/Users/yunabaek/Desktop/3. Python II/gz_2010_us_860_00_500k' 
+directory = r'C:\Users\User\OneDrive - The University of Chicago\4_DAP-2\gz_2010_us_860_00_500k'
 for file in os.listdir(directory):
     if any(file.endswith(ext) for ext in file_types):
         file_path = os.path.join(directory, file)
@@ -301,8 +301,8 @@ for file in os.listdir(directory):
 import geopandas as gpd
 # import fiona
 import pyogrio
-# shppath = r"C:\Users\User\OneDrive - The University of Chicago\4_DAP-2\gz_2010_us_860_00_500k"
-shppath = '/Users/yunabaek/Desktop/3. Python II/problem-set-4-lizzy-yuna/gz_2010_us_860_00_500k/gz_2010_us_860_00_500k.shp'
+shppath = r"C:\Users\User\OneDrive - The University of Chicago\4_DAP-2\gz_2010_us_860_00_500k"
+# shppath = '/Users/yunabaek/Desktop/3. Python II/problem-set-4-lizzy-yuna/gz_2010_us_860_00_500k/gz_2010_us_860_00_500k.shp'
 data_shp = gpd.read_file(shppath)
 texas_shp = data_shp[data_shp['ZCTA5'].str.startswith(('75', '76', '77', '78', '79'))]
 ```
@@ -507,6 +507,8 @@ closure_df = pd.DataFrame(tx_closure_df['ZIP_CD'].value_counts().reset_index())
 closure_df.columns = ['ZCTA5', 'Count']
 closure_df['ZCTA5'] = closure_df['ZCTA5'].str.replace('.0', '', regex=False)
 closure_df['ZCTA5'] = closure_df['ZCTA5'].astype(int)
+
+print(closure_df)
 ```
 
 
@@ -547,8 +549,8 @@ Attribution: <https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoDa
 ```{python}
 # Creating GeoDataFrame
 affected_gdf = gpd.GeoDataFrame(
-    texas_affected_df[texas_affected_df['Count'] > 0], 
-    geometry=texas_affected_df.geometry
+    texas_closure_df[texas_closure_df['Count'] > 0], 
+    geometry=texas_closure_df.geometry
 )
 # 10-mile (16093.4 meters) buffer
 affected_gdf['ZIP_CD'] = affected_gdf.geometry.buffer(16093.4)
