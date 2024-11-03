@@ -1,5 +1,7 @@
 ---
 title: "PS4"
+author: "Yuna Baek & Lizzy Diaz"
+date: "11/3/2024"
 format: 
   pdf:
     keep-tex: true
@@ -57,51 +59,20 @@ import matplotlib.pyplot as plt
 
 1. Read through the rest of the problem set and look through the data dictionary to identify which variables you will need to complete the exercise, and use the tool on data.cms.gov into restrict to those variables (“Manage Columns”) before exporting (“Export”). Download this for 2016 and call it pos2016.csv. What are the variables you pulled?
 
-PRVDR_CTGRY_CD, PRVDR_CTGRY_SBTYP_CD, PRVDR_NUM, PGM_TRMNTN_CD, FAC_NAME, ZIP_CD
-
-PRVDR_CTGRY_CD: Identifies the type of provider participating in the Medicare/Medicaid program. 01=Hospital
-
-PRVDR_CTGRY_SBTYP_CD: Identifies the subtype of the provider, within the primary category. Used in reporting to show the breakdown of provider categories, mainly for hospital and SNFs.
-01 = short term
-
-PRVDR_NUM: Six or ten position identification number that is assigned to a certified provider. This is the CMS Certification Number.
-
-PGM_TRMNTN_CD: Indicates the current termination status for the provider.
-
-00=ACTIVE PROVIDER
-
-01=VOLUNTARY-MERGER, CLOSURE
-
-02=VOLUNTARY-DISSATISFACTION WITH REIMBURSEMENT
-
-03=VOLUNTARY-RISK OF INVOLUNTARY TERMINATION
-
-04=VOLUNTARY-OTHER REASON FOR WITHDRAWAL
-
-05=INVOLUNTARY-FAILURE TO MEET HEALTH/SAFETY REQ
-
-06=INVOLUNTARY-FAILURE TO MEET AGREEMENT
-
-07=OTHER-PROVIDER STATUS CHANGE
-
-08=NONPAYMENT OF FEES - CLIA Only
-
-09=REV/UNSUCCESSFUL PARTICIPATION IN PT - CLIA Only
-
-10=REV/OTHER REASON - CLIA Only
-
-11=INCOMPLETE CLIA APPLICATION INFORMATION - CLIA Only 
-
-FAC_NAME: Name of the provider certified to participate in the Medicare and/or Medicaid programs.
-
-ZIP_CD:  Five-digit ZIP code for a provider's physical address.
+* PRVDR_CTGRY_CD, PRVDR_CTGRY_SBTYP_CD, PRVDR_NUM, PGM_TRMNTN_CD, FAC_NAME, ZIP_CD
+* PRVDR_CTGRY_CD: Identifies the type of provider participating in the Medicare/Medicaid program. 01=Hospital
+* PRVDR_CTGRY_SBTYP_CD: Identifies the subtype of the provider, within the primary category. Used in reporting to show the breakdown of provider categories, mainly for hospital and SNFs. (01 = short term)
+* PRVDR_NUM: Six or ten position identification number that is assigned to a certified provider. This is the CMS Certification Number.
+* PGM_TRMNTN_CD: Indicates the current termination status for the provider. (00=ACTIVE PROVIDER)
+* FAC_NAME: Name of the provider certified to participate in the Medicare and/or Medicaid programs.
+* ZIP_CD: Five-digit ZIP code for a provider's physical address.
 
 2. We want to focus on short-term hospitals. These are identified as facilities with provider type code 01 and subtype code 01. Subset your data to these facilities. How many hospitals are reported in this data? Does this number make sense? Cross-reference with other sources and cite the number you compared it to. If it differs, why do you think it could differ?
 
 ```{python}
 # Change path variable to read in files from local 
-path = r"C:\Users\User\OneDrive - The University of Chicago\4_DAP-2\PS4 Data"
-# path = "/Users/yunabaek/Desktop/3. Python II/problem-set-4-lizzy-yuna/"
+# path = r"C:\Users\User\OneDrive - The University of Chicago\4_DAP-2\PS4 Data"
+path = "/Users/yunabaek/Desktop/3. Python II/problem-set-4-lizzy-yuna/"
 
 def load_dataframes(path): 
     pos_16 = pd.read_csv(os.path.join(path, 'pos2016.csv'), encoding='ISO-8859-1') 
@@ -112,10 +83,9 @@ def load_dataframes(path):
 
 pos_16, pos_17, pos_18, pos_19 = load_dataframes(path)
 
-# This is initially how we read answered question 1. We changed it to the above code to make switching between partners much easier. 
+# This is initially how we answered question 1. We changed it to the above code to make switching between partners much easier. 
 # path = "/Users/yunabaek/Desktop/3. Python II/problem-set-4-lizzy-yuna/"
 # pos_16 = pd.read_csv("pos2016.csv")
-pos_16.info()
 ```
 
 ```{python}
@@ -170,8 +140,8 @@ obs_plot = alt.Chart(obs_df).mark_bar().encode(
     scale=alt.Scale(domain=[6000, 7500])),
 ).properties(
     title= 'Number of Observations by Year',
-    width=550,
-    height=300
+    width=500,
+    height=250
 ).configure_scale(
     clamp=True
 )
@@ -193,8 +163,8 @@ cms_plot = alt.Chart(cms_df).mark_bar().encode(
         scale=alt.Scale(domain=[6000, 7500]))
 ).properties(
     title= 'Number of Unique Hospitals by Year',
-    width=550,
-    height=300
+    width=500,
+    height=250
 ).configure_scale(
     clamp=True
 )
@@ -316,8 +286,8 @@ filtered_suspected_closed.sort_values(by=['FAC_NAME']).head(10)
 import os
 
 file_types = ['.dbf', '.prj', '.shp', '.shx', '.xml']
-# directory = '/Users/yunabaek/Desktop/3. Python II/gz_2010_us_860_00_500k' 
-directory = r'C:\Users\User\OneDrive - The University of Chicago\4_DAP-2\gz_2010_us_860_00_500k'
+directory = '/Users/yunabaek/Desktop/3. Python II/gz_2010_us_860_00_500k' 
+# directory = r'C:\Users\User\OneDrive - The University of Chicago\4_DAP-2\gz_2010_us_860_00_500k'
 for file in os.listdir(directory):
     if any(file.endswith(ext) for ext in file_types):
         file_path = os.path.join(directory, file)
@@ -331,8 +301,8 @@ for file in os.listdir(directory):
 import geopandas as gpd
 # import fiona
 import pyogrio
-shppath = r"C:\Users\User\OneDrive - The University of Chicago\4_DAP-2\gz_2010_us_860_00_500k"
-# shppath = '/Users/yunabaek/Desktop/3. Python II/problem-set-4-lizzy-yuna/gz_2010_us_860_00_500k/gz_2010_us_860_00_500k.shp'
+# shppath = r"C:\Users\User\OneDrive - The University of Chicago\4_DAP-2\gz_2010_us_860_00_500k"
+shppath = '/Users/yunabaek/Desktop/3. Python II/problem-set-4-lizzy-yuna/gz_2010_us_860_00_500k/gz_2010_us_860_00_500k.shp'
 data_shp = gpd.read_file(shppath)
 texas_shp = data_shp[data_shp['ZCTA5'].str.startswith(('75', '76', '77', '78', '79'))]
 ```
@@ -405,7 +375,6 @@ zips_texas_centroids = zips_all_centroids[
 ]
 
 print(f'There are {zips_texas_centroids['ZCTA5'].nunique()} unique zip codes in this subset.')
-
 ```
 
 Then, create all zip codes in Texas or a bordering state: zips_texas_borderstates_centroids.
@@ -436,7 +405,9 @@ zips_withhospital_centroids = zips_texas_borderstates_centroids.merge(
     right_on='ZIP_CD', 
     how='inner'
 )
+# active_2016_df.head()
 ```
+
 
 I used an inner merge, merging on the zip code variables in the two datasets. This will give only the rows with matching zip codes in both datasets. The active_2016_df contains information for all active hospitals, so if there is a zip code in that dataset which matches a zip code in the Texas and bordering states dataset, it will appear in zips_withhospital_centroids. 
 
@@ -523,10 +494,21 @@ plt.show()
 1. Using the corrected hospital closures dataset from the first section, create a list of directly affected zip codes in Texas – that is, those with at least one closure in 2016-2019. Display a table of the number of zip codes vs. the number of closures they experienced.
 
 ```{python}
-closure_df = pd.DataFrame(filtered_suspected_closed['ZIP_CD'].value_counts().reset_index())
+# Convert ZIP_CD to string type
+filtered_suspected_closed['ZIP_CD'] = filtered_suspected_closed['ZIP_CD'].astype(str)
+
+# Filtering Texas zipcodes
+tx_closure_df = filtered_suspected_closed[
+    filtered_suspected_closed['ZIP_CD'].str.startswith(('75', '76', '77', '78', '79'))
+]
+
+# Creating closure df
+closure_df = pd.DataFrame(tx_closure_df['ZIP_CD'].value_counts().reset_index())
 closure_df.columns = ['ZCTA5', 'Count']
-closure_df
+closure_df['ZCTA5'] = closure_df['ZCTA5'].str.replace('.0', '', regex=False)
+closure_df['ZCTA5'] = closure_df['ZCTA5'].astype(int)
 ```
+
 
 2. Plot a choropleth of which Texas zip codes were directly affected by a closure in 2016-2019 – there was at least one closure within the zip code. How many directly affected zip codes are there in Texas?
 
@@ -537,16 +519,20 @@ texas_closure_df = texas_shp.merge(closure_df, on='ZCTA5', how='left')
 # Fill NaN values with 0
 texas_closure_df['Count'].fillna(0, inplace=True)
 
+cmap = plt.get_cmap('viridis')
+cmap.set_under('lightgray')
+
 texas_closure_df.plot(column='Count', legend=True,
-                     cmap='viridis',
+                     cmap=cmap,
                      legend_kwds={'label': "Number of Affected Hospitals",
                                   'orientation': "horizontal"},
-                     vmin=0, vmax=5)
+                     vmin=1, vmax=5)
 
 plt.title('Number of Affected Hospitals by Zip Code')
 plt.axis('off')
 plt.show()
 ```
+
 
 ```{python}
 # Count of directly affected zip codes
@@ -559,27 +545,19 @@ print(f'There are {affected_zip_codes_count} zip codes in Texas that were direct
 Attribution: <https://geopandas.org/en/stable/docs/reference/api/geopandas.GeoDataFrame.set_geometry.html>, ChatGPT to resolve error on .set_geometry
 
 ```{python}
-# Creating a category for affected directly / indirectly / not affected
-def affected(df):
-    df['affected'] = 'Not Affected'
-    df.loc[df['Count'] > 0, 'affected'] = 'Directly Affected'
-    return df
-
-texas_affected_df = affected(texas_closure_df)
-```
-
-```{python}
 # Creating GeoDataFrame
 affected_gdf = gpd.GeoDataFrame(
     texas_affected_df[texas_affected_df['Count'] > 0], 
     geometry=texas_affected_df.geometry
 )
 # 10-mile (16093.4 meters) buffer
-affected_gdf['buffer'] = affected_gdf.geometry.buffer(16093.4)
-affected_gdf.set_geometry('buffer', inplace=True)
+affected_gdf['ZIP_CD'] = affected_gdf.geometry.buffer(16093.4)
 ```
 
+
 ```{python}
+# Matching CRS
+texas_shp = texas_shp.to_crs(affected_gdf.crs)
 # Spatial join
 indirectly_affected_gdf = gpd.sjoin(texas_shp, affected_gdf, 
                                      how='inner', predicate='intersects')
@@ -587,22 +565,21 @@ indirectly_affected_gdf = gpd.sjoin(texas_shp, affected_gdf,
 # Count the number of indirectly affected zip codes
 indirectly_affected_count = indirectly_affected_gdf['ZCTA5_left'].nunique()
 print(f'Number of indirectly affected zip codes in Texas: {indirectly_affected_count}')
+# indirectly_affected_gdf.head()
 ```
 
 
 4. Make a choropleth plot of the Texas zip codes with a different color for each of the 3 categories: directly affected by a closure, within 10 miles of closure but not directly affected, or not affected.
 
 ```{python}
-# Adding indirectly affected category
-indirectly_affected_zip_codes = indirectly_affected_gdf['ZCTA5_left'].unique()
-
-def affected(df, indirectly_affected_zipcodes):
-    df['affected'] = 'Not Affected'
-    df.loc[df['Count'] > 0, 'affected'] = 'Directly Affected'
-    df.loc[df['ZCTA5'].isin(indirectly_affected_zipcodes), 'affected'] = 'Indirectly Affected'
-    return df
-
-texas_affected_df = affected(texas_closure_df, indirectly_affected_zip_codes)
+# Creating a category for affected directly / indirectly / not affected
+texas_closure_df['Category'] = 'Not Affected'
+texas_closure_df.loc[texas_closure_df['Count'] > 0, 'Category'] = 'Directly Affected'
+texas_closure_df.loc[
+    (texas_closure_df['Category'] == 'Not Affected') & 
+    (texas_closure_df['ZCTA5'].isin(indirectly_affected_gdf['ZCTA5_left'])), 
+    'Category'
+] = 'Indirectly Affected'
 ```
 
 Attribution: ChatGPT for fixing legend errors
@@ -610,18 +587,18 @@ Attribution: ChatGPT for fixing legend errors
 color = {
     'Directly Affected': 'red',
     'Indirectly Affected': 'purple',
-    'Not Affected': 'blue'
+    'Not Affected': 'lightgrey'
 }
 
-texas_affected_df['color'] = texas_affected_df['affected'].map(color)
+texas_closure_df['color'] = texas_closure_df['Category'].map(color)
 
-texas_affected_df.plot(color=texas_affected_df['color'], legend=False)
+texas_closure_df.plot(color=texas_closure_df['color'], legend=False)
 plt.title('Number of Affected Hospitals by Zip Code')
 
 handles = [
     plt.Line2D([0], [0], color='red', lw=4, label='Directly Affected'),
     plt.Line2D([0], [0], color='purple', lw=4, label='Indirectly Affected'),
-    plt.Line2D([0], [0], color='blue', lw=4, label='Not Affected')
+    plt.Line2D([0], [0], color='lightgrey', lw=4, label='Not Affected')
 ]
 
 plt.legend(handles=handles, title="Affected Categories", loc='upper right')
